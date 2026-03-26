@@ -77,6 +77,7 @@ GET /health
 ```
 
 响应：
+
 ```json
 {
   "code": 0,
@@ -84,17 +85,25 @@ GET /health
 }
 ```
 
+**使用 curl 测试：**
+
+```bash
+curl -X GET http://localhost:8080/health
+```
+
 ### Lark 连接器接口
 
 ```http
 POST /connector
 Content-Type: application/json
-Authorization: Bearer <token>
 ```
+
+**认证方式**：Token 通过请求体中的 `verification_token` 字段传递
 
 #### get_meta - 获取元数据
 
 请求：
+
 ```json
 {
   "action": "get_meta"
@@ -102,6 +111,7 @@ Authorization: Bearer <token>
 ```
 
 响应：
+
 ```json
 {
   "code": 0,
@@ -134,9 +144,21 @@ Authorization: Bearer <token>
 }
 ```
 
+**使用 curl 测试：**
+
+```bash
+curl -X POST http://localhost:8080/connector \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "get_meta",
+    "verification_token": "your-lark-token"
+  }'
+```
+
 #### read_data - 读取数据
 
 请求：
+
 ```json
 {
   "action": "read_data",
@@ -151,6 +173,7 @@ Authorization: Bearer <token>
 ```
 
 响应：
+
 ```json
 {
   "code": 0,
@@ -190,6 +213,49 @@ Authorization: Bearer <token>
 }
 ```
 
+**使用 curl 测试：**
+
+```bash
+# 读取所有数据（第一页）
+curl -X POST http://localhost:8080/connector \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "read_data",
+    "verification_token": "your-lark-token",
+    "params": {
+      "page_size": 100,
+      "page_token": "0"
+    }
+  }'
+
+# 带日期过滤
+curl -X POST http://localhost:8080/connector \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "read_data",
+    "verification_token": "your-lark-token",
+    "params": {
+      "page_size": 50,
+      "page_token": "0",
+      "filter": {
+        "date": "2026-03-23"
+      }
+    }
+  }'
+
+# 读取第二页（使用上一页返回的 page_token）
+curl -X POST http://localhost:8080/connector \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "read_data",
+    "verification_token": "your-lark-token",
+    "params": {
+      "page_size": 100,
+      "page_token": "100"
+    }
+  }'
+```
+
 ## 日志文件格式
 
 支持 `slippage-YYYYMMDD.txt` 格式的 CSV 文件：
@@ -210,11 +276,12 @@ time,login,symbol,b/s,lot,req price,old price,new price,price diff,slip,action,c
 ### 构建流程
 
 1. 推送代码到 `main` 分支或创建 PR 时：
+
    - 运行测试
    - 编译 Windows amd64 版本
    - 编译 Linux amd64 版本
-
 2. 创建版本标签（如 `v1.0.0`）时：
+
    - 运行所有测试
    - 编译两个平台的可执行文件
    - 创建 GitHub Release 并上传构建产物
@@ -249,3 +316,5 @@ go test ./... -v -cover
 ## 许可证
 
 MIT License
+
+By Moon
