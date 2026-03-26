@@ -1,5 +1,4 @@
 name: Build and Release
-
 on:
   push:
     branches:
@@ -10,6 +9,10 @@ on:
     branches:
       - main
 
+# 👇 关键：必须加权限
+permissions:
+  contents: write
+  
 jobs:
   test:
     runs-on: ubuntu-latest
