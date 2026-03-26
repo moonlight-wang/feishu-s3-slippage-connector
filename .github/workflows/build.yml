@@ -1,4 +1,4 @@
-name: Build
+name: Build and Release
 
 on:
   push:
@@ -86,11 +86,12 @@ jobs:
           name: s3-rest-linux-amd64
           path: ./dist
 
-      - name: Create Release
+      - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
         with:
           files: |
             ./dist/s3-rest-windows-amd64.exe
             ./dist/s3-rest-linux-amd64
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
